@@ -1,5 +1,6 @@
 from FSMRule import FSMRule
 from inspect import isfunction
+from Keypad import Keypad
 
 
 def signal_is_digit(signal):
@@ -31,6 +32,7 @@ class FSM:
         query the agent for the next signal.
         :return: None
         """
+
         pass
 
     def run(self):
@@ -63,7 +65,7 @@ class FSM:
         self.state = rule.s2
 
         # give that method two arguments (the agent itself and the current signal
-        rule.action(rule)
+        rule.action()
 
     def main(self):
         pass
