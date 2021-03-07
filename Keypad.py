@@ -58,10 +58,10 @@ class Keypad:
             result = self.do_polling()
             if result:
                 row, col = result[0], result[1]
-                print(f"Row: {rp}, Column: {cp}")
+                print(f"Row: {row}, Column: {col}")
                 if row <= 3 and col <= 2:
 
-                    # How to find the right button numberfor button pressed
+                    # How to find the right button number for button pressed
                     button = row*3 + col + 1
 
                     if button < 10:
