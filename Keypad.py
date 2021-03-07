@@ -1,4 +1,4 @@
-from GPIOSimulator_v5 import GPIOSimulator
+from GPIOSimulator_v5 import *
 import time
 
 GPIO = GPIOSimulator()
@@ -11,8 +11,9 @@ class Keypad:
         """
         Init method
         """
-        self.rowpins = []
-        self.columnpins = []
+        self.rowpins = keypad_row_pins
+        self.columnpins = keypad_col_pins
+        self.setup()
 
     def setup(self):
         """
@@ -20,7 +21,11 @@ class Keypad:
         :return: None
         """
 
-        pass
+        for row_pin, rp in enumerate(self.rowpins):
+            GPIO.setup(rp, GPIO.OUT)
+
+        for col_pin, cp in enumerate(self.columnpins):
+            GPIO.setup(cp, GPIO.IN, state=GPIO.LOW)
 
     def do_polling(self):
         """
@@ -28,13 +33,18 @@ class Keypad:
         pressed on the keypad.
         :return: None
         """
-        for rp in enumerate(self.rowpins):
+        for row_pin, rp in enumerate(self.rowpins):
             # setting the rowpin HIGH one at a time.
             GPIO.output(rp, GPIO.HIGH)
 
-            for cp in enumerate(self.columnpins):
+            for col_pin, cp in enumerate(self.columnpins):
                 # If column C has a HIGH reading, then the key at location (R,C) is revealed as the one being pressed.
-                pass
+                if GPIO.input(cp) == GPIO.HIGH:
+                    return rp, cp
+
+            GPIO.output(rp, GPIO.LOW)
+            time.sleep(0.01)
+        return None
 
     def get_next_signal(self):
         """
@@ -42,6 +52,28 @@ class Keypad:
         initiate repeated calls to do polling until a key press is detected.
         :return: None
         """
+
+        # TODO: Make sure this is not an infinite loop
+        while True:
+            result = self.do_polling()
+            if result:
+                row, col = result[0], result[1]
+                print(f"Row: {rp}, Column: {cp}")
+                if row <= 3 and col <= 2:
+
+                    # How to find the right button numberfor button pressed
+                    button = row*3 + col + 1
+
+                    if button < 10:
+                        return str(button)
+
+                    else:
+                        if button == 10:
+                            return '*'
+                        elif button == 11:
+                            return '0'
+                        elif button == 12:
+                            return '#'
 
     def main(self):
         pass
