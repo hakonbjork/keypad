@@ -1,3 +1,4 @@
+import GPIOSimulator_v5 as GPIO
 
 class Keypad:
     """  Keypad """

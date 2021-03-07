@@ -1,4 +1,9 @@
 from FSMRule import FSMRule
+from inspect import isfunction
+
+
+def signal_is_digit(signal):
+    return 48 <= ord(signal) <= 57
 
 
 class FSM:
@@ -44,7 +49,7 @@ class FSM:
         check whether the rule condition is fulfilled.
         :return: True if condition is fulfilled, False if not
         """
-        if self.singal == rule.signal:
+        if self.singal == rule.signal and signal_is_digit(self.singal):
             return True
         else:
             return False
