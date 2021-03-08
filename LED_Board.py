@@ -1,8 +1,26 @@
+from GPIOSimulator_v5 import *
+import time
+
+GPIO = GPIOSimulator()
+
+
 class LED_Board:
     """  LED_Board """
 
     def __init__(self):
-        pass
+        self._led_comb = {
+            # 0: output high
+            # -1: output low
+            # 1: input high
+            0: [0, -1, 1],  # riktig
+            1: [-1, 0, 1],  # riktig
+            2: [0, 1, - 1],
+            3: [0, -1, 1],
+            4: [1, 0, -1],
+            5: [-1, 0, 1],
+            "all_led": [1, 1, 1],
+            "no_led": [-1, -1, -1]
+        }
 
     def light_led(self, led_number):
         """
@@ -11,6 +29,12 @@ class LED_Board:
         output pins.
         :return: None
         """
+        verdier = self._led_comb.get(led_number)
+        pin1 = verdier[0]
+        pin2 = verdier[1]
+        pin3 = verdier[2]
+
+        GPIO.setup(led_number, )
 
     def flash_all_leds(self):
         """
