@@ -1,10 +1,6 @@
 """ Module for FSM Rule class """
 
 
-def signal_is_digit(signal):
-    return 48 <= ord(signal) <= 57
-
-
 class FSMRule:
     """
     Each rule has the following meaning:
@@ -36,7 +32,7 @@ class FSMRule:
         check whether the rule condition is fulfilled.
         :return: True if condition is fulfilled, False if not
         """
-        if self.fsm.signal == self.signal and signal_is_digit(self.fsm.signal):
+        if self.fsm.signal == self.signal:
             return True
         else:
             return False
@@ -47,7 +43,7 @@ class FSMRule:
         agent action method.
         :return: None
         """
-        self.fsm.state = self.s2
+        self.fsm.state = self.state2
 
         # give that method two arguments (the agent itself and the current signal
         rule.action(self.fsm.agent, self.fsm.signal)
