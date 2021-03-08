@@ -14,9 +14,9 @@ class KPC:
         self.led_board = LED_Board()
         self.FSM = FSM()
         self.path_name = "/password.txt"
-        self.override_signal = None
+        self.override_signal = ""
         # cumulative password
-        self.CUMP = ""
+        self.CUMP = ''
         self.Lid = 0
         self.Ldur = 0
 
@@ -24,7 +24,7 @@ class KPC:
         """ Clear passcode buffer, initiate power_up lightning sequence
         on led board """
 
-        self.CP = ''
+        self.CUMP = ''
         self.override_signal = ''
         self.led_board.power_up_the_system()
 
@@ -33,7 +33,9 @@ class KPC:
         next pressed key """
 
         if self.override_signal:
-            return self.override_signal
+            ov_sig = self.override_signal
+            self.override_signal = ''
+            return ov_sig
 
         return self.keypad.get_next_signal()
 
@@ -56,22 +58,29 @@ class KPC:
 
     def validate_password_change(self, password):
         """ Check that new password is legal and write it to password file """
+
+        legal = True
         if len(password) > 4:
             for i in password:
-                if 0 <= int(i) <= 9:
-                    f = open(self.path_name, "w")
-                    f.write(password)
-                    f.close()
-                    # led lights
+                if not (0 <= int(i) <= 9):
+                    legal = False
+
+        if legal:
+            f = open(self.path_name, "w")
+            f.write(password)
+            f.close()
+            self.led_board.successful_login()
         else:
-            # led lights
-            pass
+            self.led_board.flash_all_lights()
 
     def light_one_led(self):
         self.led_board.user_choose_led(self.Lid, self.Ldur)
 
     def flash_leds(self):
         self.led_board.flash_all_leds()
+
+    def twinkle_leds(self):
+        self.led_board.twinkle_all_leds(2)
 
     def exit_action(self):
         self.led_board.power_down_the_system()
