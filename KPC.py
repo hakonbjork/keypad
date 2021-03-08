@@ -9,10 +9,10 @@ from FSMRule import FSMRule
 class KPC:
     """  KPC """
 
-    def __init__(self):
+    def __init__(self, FSM):
         self.keypad = Keypad()
         self.led_board = LED_Board()
-        self.FSM = FSM()
+        self.FSM = FSM
         self.path_name = "/password.txt"
         self.override_signal = ""
         # cumulative password
@@ -29,7 +29,7 @@ class KPC:
         self.led_board.power_up_the_system()
 
     def get_next_signal(self):
-        """ Return the overrid_signal if not blank, else query keypad for
+        """ Return the override_signal if not blank, else query keypad for
         next pressed key """
 
         if self.override_signal:
@@ -72,6 +72,23 @@ class KPC:
             self.led_board.successful_login()
         else:
             self.led_board.flash_all_lights()
+
+    def append_next_password_digit(self, signal):
+        """ A loop that will continue until override_signal is sent to FSM. 
+        Agent gets signal from FSM and updates CUMP until * is pressed """
+
+        self.CUMP += signal
+
+        while True:
+            next_signal = self.get_next_signal()
+            # check for override_signal
+            if not (next_signal == "*"):
+                self.CUMP += signal
+
+            # if * is pressed, verify login and send override_signal back to fsm
+            else:
+                self.verify_login()
+                return self.override_signal
 
     def light_one_led(self):
         self.led_board.user_choose_led(self.Lid, self.Ldur)
