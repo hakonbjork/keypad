@@ -15,10 +15,6 @@ class FSM:
         self.rules = []
         self.state = 'S-Init'
         self.signal = None
-        # current password
-        self.CP = ''
-        # cumulative password
-        self.CUMP = ''
 
     def add_rule(self, s1, s2, signal, action):
         """
