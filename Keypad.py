@@ -50,7 +50,7 @@ class Keypad:
         """
         This is the main interface between the agent and the keypad. It should
         initiate repeated calls to do polling until a key press is detected.
-        :return: None
+        :return: String representation of button pressed
         """
 
         # TODO: Make sure this is not an infinite loop
