@@ -70,7 +70,13 @@ class FSM:
                          self.all_signals, agent.reset_passcode_entry)
 
         rule_2 = FSMRule(self, 'S-Read', 'S-Read', self.all_digits,
-                         signal.append_next_password_digit)
+                         agent.append_next_password_digit)
+
+        rule_3 = FSMRule(self, 'S-Read', 'S-Verify', '*', agent.verify_login)
+
+        # look at page 11 in project description for more rules,
+        # and take a look at drawing of FSM.
+        # Each arc/line there should correspond to a rule.
 
     def main(self):
         pass

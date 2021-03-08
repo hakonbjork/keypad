@@ -47,7 +47,7 @@ class KPC:
         password = f.readline()
         f.close()
 
-        if self.CUMP == password:
+        if self.CUMP == str(password):
             self.override_signal = "Y"
             self.led_board.successful_login()
         else:
@@ -74,21 +74,8 @@ class KPC:
             self.led_board.flash_all_lights()
 
     def append_next_password_digit(self, signal):
-        """ A loop that will continue until override_signal is sent to FSM. 
-        Agent gets signal from FSM and updates CUMP until * is pressed """
-
+        """ Adds the current signal to cumulative password (CUMP) """
         self.CUMP += signal
-
-        while True:
-            next_signal = self.get_next_signal()
-            # check for override_signal
-            if not (next_signal == "*"):
-                self.CUMP += signal
-
-            # if * is pressed, verify login and send override_signal back to fsm
-            else:
-                self.verify_login()
-                return self.override_signal
 
     def light_one_led(self):
         self.led_board.user_choose_led(self.Lid, self.Ldur)
