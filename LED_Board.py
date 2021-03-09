@@ -1,5 +1,8 @@
-from GPIOSimulator_v5 import *
+"""Module for the LED_Board class"""
+
 import time
+from GPIOSimulator_v5 import GPIOSimulator, PIN_CHARLIEPLEXING_0, PIN_CHARLIEPLEXING_1, PIN_CHARLIEPLEXING_2
+
 
 GPIO = GPIOSimulator()
 
@@ -23,7 +26,7 @@ class LED_Board:
         }
 
     def set_pin(self, pin_number, value):
-        """ helper function to set the the charlieplexing pins to 
+        """ helper function to set the the charlieplexing pins to
         the right state """
 
         if value == 0:
@@ -99,11 +102,12 @@ class LED_Board:
             time.sleep(0.2)
             new_time = time.time()
 
-            # In addition, you will need methods for the lighting patterns associated with powering up (and
-            # down) the system.
+            # In addition, you will need methods for the lighting patterns
+            # associated with powering up (and down) the system.
 
-            # A display of lights (of your choosing) that indicates “powering up”. This should be performed
-            # when the user does the very first keystroke of a session.
+            # A display of lights (of your choosing) that indicates “powering up”.
+            # This should be performed when the user does the very first
+            # keystroke of a session.
 
     def power_up_the_system(self):
         """ Lights up a pattern to signal that the system is booting up """
@@ -118,13 +122,15 @@ class LED_Board:
 
         self.turn_off_all_leds()
 
-    # Flashing of all lights “in synchrony” when the user enters the wrong password during login.
+    # Flashing of all lights “in synchrony” when the user enters the wrong
+    # password during login.
     def flash_all_lights(self):
         """ Turns all lights on and off to signal wrong password """
 
         self.flash_all_leds(0.5)
 
-    # Twinkling the lights (in any sequence you choose) when the user successfully logs in
+    # Twinkling the lights (in any sequence you choose) when the user
+    # successfully logs in
     def successful_login(self):
         """ Twinkle the lights in a pattern to signal successfully login """
 
@@ -147,9 +153,10 @@ class LED_Board:
         self.turn_off_all_leds()
 
     # Turn one user-specified LED on for a user-specified number of seconds, where information
-    # about the particular LED and duration are entered via the simulated keypad.
+    # about the particular LED and duration are entered via the simulated
+    # keypad.
     def user_choose_led(self, led_num, duration):
-        """ Gets user-specified LED and duration from simulated keypad, 
+        """ Gets user-specified LED and duration from simulated keypad,
         light up that LED for the user-specified duration """
 
         self.light_led(led_num)

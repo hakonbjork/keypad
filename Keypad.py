@@ -1,5 +1,8 @@
-from GPIOSimulator_v5 import *
+"""Module for the Keypad class"""
+
 import time
+from GPIOSimulator_v5 import GPIOSimulator, keypad_row_pins, keypad_col_pins
+
 
 GPIO = GPIOSimulator()
 
@@ -33,17 +36,18 @@ class Keypad:
         pressed on the keypad.
         :return: None
         """
-        for r, rp in enumerate(self.rowpins):
+        for row_index, row_pin in enumerate(self.rowpins):
             # setting the rowpin HIGH one at a time.
-            GPIO.output(rp, GPIO.HIGH)
+            GPIO.output(row_pin, GPIO.HIGH)
 
-            for c, cp in enumerate(self.columnpins):
-                # If column C has a HIGH reading, then the key at location (R,C) is revealed as the one being pressed.
-                if GPIO.input(cp) == GPIO.HIGH:
-                    GPIO.output(rp, GPIO.LOW)
-                    return r, c
+            for col_index, col_pin in enumerate(self.columnpins):
+                # If column C has a HIGH reading, then the key at location (R,C)
+                # is revealed as the one being pressed.
+                if GPIO.input(col_pin) == GPIO.HIGH:
+                    GPIO.output(row_pin, GPIO.LOW)
+                    return row_index, col_index
 
-            GPIO.output(rp, GPIO.LOW)
+            GPIO.output(row_pin, GPIO.LOW)
             time.sleep(0.02)
         return None
 
@@ -70,27 +74,9 @@ class Keypad:
 
                     if button < 10:
                         return str(button)
-
-                    else:
-                        if button == 10:
-                            return '*'
-                        elif button == 11:
-                            return '0'
-                        elif button == 12:
-                            return '#'
-
-    def main(self):
-        pass
-
-
-if __name__ == '__main__':
-    print("Heihei test")
-    keypad = Keypad()
-    while True:
-        sign = keypad.get_next_signal()
-        print("Signal = ", sign)
-
-        # skal gjøre polling
-        # self
-        # This is the main interface between the agent and the keypad.
-        # It should initiate repeated calls to do polling until a key press is detected.
+                    if button == 10:
+                        return '*'
+                    if button == 11:
+                        return '0'
+                    if button == 12:
+                        return '#'
