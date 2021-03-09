@@ -73,7 +73,8 @@ class FSM:
             ruleFired = False
             for rule in self.rules:
                 if self.state == rule.state1 and rule.match():
-                    print(f"Rule to fire: {str(rule.state1)}")
+                    print(
+                        f"Rule to fire: {str(rule.state1)} --> {str(rule.state2)}")
                     rule.fire()
                     ruleFired = True
                     break
@@ -89,21 +90,41 @@ class FSM:
     def add_rules(self):
         """ create and add the rules to be used """
         self.add_rule('S-Init', 'S-Read',
-                      all_signals, self.agent.reset_passcode_entry)
+                      all_signals, self.agent.reset_passcode_entry)  # 1
 
         self.add_rule('S-Read', 'S-Read', all_digits,
-                      self.agent.append_next_password_digit)
+                      self.agent.append_next_password_digit)  # 2
 
-        self.add_rule('S-Read', 'S-Verify', '*', self.agent.verify_login)
+        self.add_rule('S-Read', 'S-Verify', '*', self.agent.verify_login)  # 3
 
         self.add_rule('S-Read', 'S-Init', all_signals,
-                      self.agent.exit_action)
+                      self.agent.exit_action)  # 4
 
         self.add_rule('S-Verify', 'S-Active', 'Y',
-                      self.agent.fully_activate_agent)
+                      self.agent.fully_activate_agent)  # 5
 
         self.add_rule('S-Verify', 'S-Init',
-                      all_signals, self.agent.exit_action)
+                      all_signals, self.agent.exit_action)  # 6-1
+
+        self.add_rule('S-Active', 'S-Read-2', '*',
+                      self.agent.reset_password)  # 6-2
+
+        self.add_rule('S-Read-2', 'S-Read-2', all_digits,
+                      self.agent.append_next_password_digit)  # 7
+
+        self.add_rule('S-Read-2', 'S-Active', '*',
+                      self.agent.validate_password_change)  # 8
+
+        self.add_rule('S-Active', 'S-Led', all_digits,
+                      self.agent.set_user_led_ID)  # 9
+
+        self.add_rule('S-Led', 'S-Time', '*', self.agent.do_nothing)  # 10
+
+        self.add_rule('S-Time', 'S-Time', all_digits,
+                      self.agent.append_digit_to_user_led_duration)  # 11
+
+        self.add_rule('S-Time', 'S-Active', '*',
+                      self.agent.light_one_led)  # 12
 
         # look at page 9 in project description for more rules,
         # and take a look at drawing of FSM.

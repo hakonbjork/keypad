@@ -28,6 +28,11 @@ class KPC:
         self.override_signal = ''
         self.led_board.power_up_the_system()
 
+    def reset_password(self, signal):
+        """ Resets password to empty string """
+        self.CUMP = ''
+        print("Current password reset. Please type new password")
+
     def get_next_signal(self):
         """ Return the override_signal if not blank, else query keypad for
         next pressed key """
@@ -52,15 +57,19 @@ class KPC:
         if self.CUMP == str(password):
             self.override_signal = "Y"
             self.led_board.successful_login()
+            print("Successfully logged in")
         else:
             self.override_signal = "N"
             self.led_board.flash_all_lights()
+            print("Login failed, password incorrect")
 
         # TODO: Find out whether we should clear override_signal sometime
 
     # tror ikke disse parametere er helt good
-    def validate_password_change(self, password):
+    def validate_password_change(self, signal):
         """ Check that new password is legal and write it to password file """
+
+        password = self.CUMP
 
         legal = True
         if len(password) > 4:
@@ -73,15 +82,32 @@ class KPC:
             f.write(password)
             f.close()
             self.led_board.successful_login()
+            print("Password changed successfully")
         else:
             self.led_board.flash_all_lights()
+            print("New password not legal. Password not changed")
 
     def append_next_password_digit(self, signal):
         """ Adds the current signal to cumulative password (CUMP) """
         self.CUMP += signal
         print("Next digit added to CUMP")
 
-    def light_one_led(self):
+    def set_user_led_ID(self, signal):
+        """ Sets the self.Lid (led number) after user input """
+
+        if 0 <= signal <= 5:
+            self.Lid = signal
+
+        else:
+            print("Wrong digit, must be 0 - 5")
+
+    def append_digit_to_user_led_duration(self, signal):
+        """ Sets the self.Ldur after user input """
+        self.Ldur += signal
+        print("Digit added to duration")
+
+    def light_one_led(self, signal):
+        """ Lights up one LED based on user input """
         self.led_board.user_choose_led(self.Lid, self.Ldur)
 
     def flash_leds(self):
@@ -99,4 +125,10 @@ class KPC:
         man være i stand til å gjøre ting i innlogget tilstand, men mulig
         det fikses av FSM  """
 
+        print("Ready to use!")
+
+        pass
+
+    def do_nothing(self, agent):
+        """ Does nothing """
         pass
