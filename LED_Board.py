@@ -56,6 +56,8 @@ class LED_Board:
         self.set_pin(PIN_CHARLIEPLEXING_1, pin1_value)
         self.set_pin(PIN_CHARLIEPLEXING_2, pin2_value)
 
+        GPIO.show_leds_states()
+
     def flash_all_leds(self, k):
         """
         Flash all 6 LEDs on and off for k seconds, where k is an argument of the
