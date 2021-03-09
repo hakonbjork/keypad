@@ -1,37 +1,51 @@
+""" Module for the Finale State Machine (FSM) class """
+
+import time
 from FSMRule import FSMRule
-from inspect import isfunction
+from Keypad import Keypad
+from KPC import *
 
 
 def signal_is_digit(signal):
+    """ Check if signal is a digit """
     return 48 <= ord(signal) <= 57
 
 
+def all_signals(signal):
+    """ Simple method to accept a signal """
+    return True
+
+
+def all_digits(signal):
+    """ Simple method to accept all digits """
+    return signal_is_digit(signal)
+
+
 class FSM:
-    """  An FSM object should house a pointer back to the agent, since it will make many requests to the
-    agent (KPC) object. """
+    """  An FSM object should house a pointer back to the agent,
+    since it will make many requests to the agent (KPC) object. """
 
     def __init__(self):
         self.rules = []
         self.state = 'S-Init'
         self.signal = None
-        # current password
-        self.CP = ''
-        # cumulative password
-        self.CUMP = ''
+        self.agent = KPC(self)
+        self.add_rules()
 
-    def add_rule(self, s1, s2, signal, action):
+    def add_rule(self, state1, state2, signal, action):
         """
         add a new rule to the end of the FSM’s rule list.
         :return: None
         """
-        self.rules.append(FSMRule(s1, s2, signal, action))
+        self.rules.append(FSMRule(self, state1, state2, signal, action))
 
-    def gen_next_signal(self):
+    def get_next_signal(self):
         """
         query the agent for the next signal.
         :return: None
         """
-        pass
+
+        return self.agent.get_next_signal()
 
     def run(self):
         """
@@ -39,31 +53,83 @@ class FSM:
         run the rules one by one until reaching the final state.
         :return: None
         """
-        for rule in self.rules:
-            if self.state == rule.s1 and self.match(rule):
-                self.fire(rule)
 
-    # There are two key methods for a FSM rule
-    def match(self, rule):
-        """
-        check whether the rule condition is fulfilled.
-        :return: True if condition is fulfilled, False if not
-        """
-        if self.singal == rule.signal and signal_is_digit(self.singal):
-            return True
-        else:
-            return False
+        while self.state != 'S-Exit':
+            print()
 
-    def fire(self, rule):
-        """
-        use the consequent of a rule to a) set the next state of the FSM, and b) call the appropriate
-        agent action method.
-        :return: None
-        """
-        self.state = rule.s2
+            print("Waiting for signal...")
+            self.signal = self.get_next_signal()
+            print(f"Received signal: {self.signal}")
 
-        # give that method two arguments (the agent itself and the current signal
-        rule.action(rule)
+            rule_fired = False
+            for rule in self.rules:
+                if self.state == rule.state1 and rule.match():
+                    print(
+                        f"Rule to fire: {str(rule.state1)} --> {str(rule.state2)}")
+                    rule.fire()
+                    rule_fired = True
+                    break
 
-    def main(self):
-        pass
+            if not rule_fired:
+                print("Error: No rules fired")
+
+    def add_rules(self):
+        """ create and add the rules to be used """
+        self.add_rule('S-Init', 'S-Read',
+                      all_signals, self.agent.reset_passcode_entry)  # 1
+
+        self.add_rule('S-Read', 'S-Read', all_digits,
+                      self.agent.append_next_password_digit)  # 2
+
+        self.add_rule('S-Read', 'S-Verify', '*', self.agent.verify_login)  # 3
+
+        self.add_rule('S-Read', 'S-Init', all_signals,
+                      self.agent.exit_action)  # 4
+
+        self.add_rule('S-Verify', 'S-Active', 'Y',
+                      self.agent.fully_activate_agent)  # 5
+
+        self.add_rule('S-Verify', 'S-Init',
+                      all_signals, self.agent.exit_action)  # 6-1
+
+        self.add_rule('S-Active', 'S-Read-2', '*',
+                      self.agent.reset_password)  # 6-2
+
+        self.add_rule('S-Read-2', 'S-Read-2', all_digits,
+                      self.agent.append_next_password_digit)  # 7
+
+        self.add_rule('S-Read-2', 'S-Active', '*',
+                      self.agent.validate_password_change)  # 8
+
+        self.add_rule('S-Active', 'S-Led', all_digits,
+                      self.agent.set_user_led_ID)  # 9
+
+        self.add_rule('S-Led', 'S-Time', '*', self.agent.do_nothing)  # 10
+
+        self.add_rule('S-Time', 'S-Time', all_digits,
+                      self.agent.append_digit_to_user_led_duration)  # 11
+
+        self.add_rule('S-Time', 'S-Active', '*',
+                      self.agent.light_one_led)  # 12
+
+        self.add_rule('S-Active', 'S-Logout', '#',
+                      self.agent.confirm_logout)  # 13
+
+        self.add_rule('S-Logout', 'S-Init', '#', self.agent.exit_action)  # 14
+
+        self.add_rule('S-Logout', 'S-Active', all_signals,
+                      self.agent.do_nothing)  # 15
+
+        # look at page 9 in project description for more rules,
+        # and take a look at drawing of FSM.
+        # Each arc/line there should correspond to a rule.
+
+
+def main():
+    """ Main function for keypad program """
+    fsm = FSM()
+    fsm.run()
+
+
+if __name__ == "__main__":
+    main()
