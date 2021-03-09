@@ -39,21 +39,15 @@ class FSMRule:
             # print(f"Signal is function, returning boolean")
             return self.signal(self.fsm.signal)
 
-        if self.fsm.signal == self.signal:
-            return True
-        else:
-            return False
+        return self.fsm.signal == self.signal
 
     def fire(self):
         """
-        use the consequent of a rule to a) set the next state of the FSM, and b) call the appropriate
-        agent action method.
+        use the consequent of a rule to a) set the next state of the FSM,
+        and b) call the appropriate agent action method.
         :return: None
         """
         self.fsm.state = self.state2
 
         # give that method two arguments (the agent itself and the current signal
         self.action(self.fsm.signal)
-
-    def main(self):
-        pass
