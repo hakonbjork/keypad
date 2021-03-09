@@ -1,22 +1,13 @@
+""" Module for the Finale State Machine (FSM) class """
+
+import time
 from FSMRule import FSMRule
-from inspect import isfunction
 from Keypad import Keypad
 from KPC import *
-import time
-
-states = [
-    'S-Init',  # initial state. cump should be empty
-    'S-Read',  # state when reading password
-    'S-Verify',  # when verifying password (short amount of time)
-    'S-Active',  # usual state when 'logged in'
-    'S-Read-2',  # read new password when user want to change password
-    'S-Read-3',  # enter new password again
-    'S-Led',  # when user want to light up led, read input as led number
-    'S-Time'  # for a duration, read input as time in seconds
-]
 
 
 def signal_is_digit(signal):
+    """ Check if signal is a digit """
     return 48 <= ord(signal) <= 57
 
 
@@ -31,8 +22,8 @@ def all_digits(signal):
 
 
 class FSM:
-    """  An FSM object should house a pointer back to the agent, since it will make many requests to the
-    agent (KPC) object. """
+    """  An FSM object should house a pointer back to the agent,
+    since it will make many requests to the agent (KPC) object. """
 
     def __init__(self):
         self.rules = []
@@ -41,12 +32,12 @@ class FSM:
         self.agent = KPC(self)
         self.add_rules()
 
-    def add_rule(self, s1, s2, signal, action):
+    def add_rule(self, state1, state2, signal, action):
         """
         add a new rule to the end of the FSM’s rule list.
         :return: None
         """
-        self.rules.append(FSMRule(self, s1, s2, signal, action))
+        self.rules.append(FSMRule(self, state1, state2, signal, action))
 
     def get_next_signal(self):
         """
@@ -70,16 +61,16 @@ class FSM:
             self.signal = self.get_next_signal()
             print(f"Received signal: {self.signal}")
 
-            ruleFired = False
+            rule_fired = False
             for rule in self.rules:
                 if self.state == rule.state1 and rule.match():
                     print(
                         f"Rule to fire: {str(rule.state1)} --> {str(rule.state2)}")
                     rule.fire()
-                    ruleFired = True
+                    rule_fired = True
                     break
 
-            if not ruleFired:
+            if not rule_fired:
                 print("Error: No rules fired")
 
     def add_rules(self):
@@ -135,6 +126,7 @@ class FSM:
 
 
 def main():
+    """ Main function for keypad program """
     fsm = FSM()
     fsm.run()
 
