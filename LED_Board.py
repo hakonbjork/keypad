@@ -12,12 +12,12 @@ class LED_Board:
             # 0: output high
             # -1: output low
             # 1: input high
-            0: [0, -1, 1],  # riktig
-            1: [-1, 0, 1],  # riktig
-            2: [0, 1, - 1],
-            3: [0, -1, 1],
-            4: [1, 0, -1],
-            5: [-1, 0, 1],
+            0: [0, -1, 1],
+            1: [-1, 0, 1],
+            2: [1, 0, - 1],
+            3: [1, -1, 0],
+            4: [0, 1, -1],
+            5: [-1, 1, 0],
             "all_led": [1, 1, 1],
             "no_led": [-1, -1, -1]
         }
@@ -79,7 +79,7 @@ class LED_Board:
         """ Turns off all the leds """
 
         for i in range(3):
-            self.set_pin(i, -1)
+            self.set_pin(i, 1)
 
     def twinkle_all_leds(self, k):
         """
