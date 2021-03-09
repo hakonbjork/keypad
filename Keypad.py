@@ -54,11 +54,14 @@ class Keypad:
         :return: String representation of button pressed
         """
 
-        # TODO: Make sure this is not an infinite loop
+        old_result = None
         while True:
+            time.sleep(0.05)
             result = self.do_polling()
             if result:
-                row, col = result[0], result[1]
+                old_result = result
+            if result != old_result:
+                row, col = old_result[0], old_result[1]
                 # print(f"Row: {row}, Column: {col}")
                 if row <= 3 and col <= 2:
 

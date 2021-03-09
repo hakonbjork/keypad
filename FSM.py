@@ -39,6 +39,7 @@ class FSM:
         self.state = 'S-Init'
         self.signal = None
         self.agent = KPC(self)
+        self.add_rules()
 
     def add_rule(self, s1, s2, signal, action):
         """
@@ -64,7 +65,6 @@ class FSM:
 
         while self.state != 'S-Exit':
             print()
-            time.sleep(0.2)  # burde ikke trenge denne men klikker uten
 
             print("Waiting for signal...")
             self.signal = self.get_next_signal()
@@ -79,13 +79,8 @@ class FSM:
                     ruleFired = True
                     break
 
-                else:
-                    print(
-                        f"Rule with start-state {str(rule.state1)} not fired")
-
             if not ruleFired:
-                print("No rules fired")
-                break
+                print("Error: No rules fired")
 
     def add_rules(self):
         """ create and add the rules to be used """
@@ -126,6 +121,14 @@ class FSM:
         self.add_rule('S-Time', 'S-Active', '*',
                       self.agent.light_one_led)  # 12
 
+        self.add_rule('S-Active', 'S-Logout', '#',
+                      self.agent.confirm_logout)  # 13
+
+        self.add_rule('S-Logout', 'S-Init', '#', self.agent.exit_action)  # 14
+
+        self.add_rule('S-Logout', 'S-Active', all_signals,
+                      self.agent.do_nothing)  # 15
+
         # look at page 9 in project description for more rules,
         # and take a look at drawing of FSM.
         # Each arc/line there should correspond to a rule.
@@ -133,8 +136,6 @@ class FSM:
 
 def main():
     fsm = FSM()
-    fsm.add_rules()
-    print("Rules added succesfully")
     fsm.run()
 
 

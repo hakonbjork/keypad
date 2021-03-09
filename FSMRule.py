@@ -40,10 +40,8 @@ class FSMRule:
             return self.signal(self.fsm.signal)
 
         if self.fsm.signal == self.signal:
-            print("Signal is not function, returning True")
             return True
         else:
-            print("Signal is not function, returning False")
             return False
 
     def fire(self):

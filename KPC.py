@@ -17,8 +17,8 @@ class KPC:
         self.override_signal = ""
         # cumulative password
         self.CUMP = ''
-        self.Lid = 0
-        self.Ldur = 0
+        self.Lid = ''
+        self.Ldur = ''
 
     def reset_passcode_entry(self, signal):
         """ Clear passcode buffer, initiate power_up lightning sequence
@@ -71,11 +71,15 @@ class KPC:
 
         password = self.CUMP
 
-        legal = True
+        legal = False
         if len(password) > 4:
             for i in password:
-                if not (0 <= int(i) <= 9):
+                if (0 <= int(i) <= 9):
+                    legal = True
+
+                else:
                     legal = False
+                    break
 
         if legal:
             f = open(self.path_name, "w")
@@ -95,8 +99,8 @@ class KPC:
     def set_user_led_ID(self, signal):
         """ Sets the self.Lid (led number) after user input """
 
-        if 0 <= signal <= 5:
-            self.Lid = signal
+        if 0 <= int(signal) <= 5:
+            self.Lid = int(signal)
 
         else:
             print("Wrong digit, must be 0 - 5")
@@ -108,7 +112,11 @@ class KPC:
 
     def light_one_led(self, signal):
         """ Lights up one LED based on user input """
-        self.led_board.user_choose_led(self.Lid, self.Ldur)
+        led_id = int(self.Lid)
+        led_duration = int(self.Ldur)
+        self.Lid = ''
+        self.Ldur = ''
+        self.led_board.user_choose_led(led_id, led_duration)
 
     def flash_leds(self):
         self.led_board.flash_all_leds()
@@ -117,8 +125,17 @@ class KPC:
         self.led_board.twinkle_all_leds(2)
 
     def exit_action(self, signal):
+        """ Shuts down and resets values """
+
+        print("Logging out...")
+
         self.led_board.power_down_the_system()
         self.__init__(self.FSM)
+
+    def confirm_logout(self, agent):
+        """ Asks user to confirm logout """
+
+        print("Press # to confirm logout, or anything else to abort")
 
     def fully_activate_agent(self, signal):
         """ Vet ikke om man trenger noe her, etter denne er kjørt skal 
