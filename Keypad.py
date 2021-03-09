@@ -44,7 +44,7 @@ class Keypad:
                     return r, c
 
             GPIO.output(rp, GPIO.LOW)
-            time.sleep(0.01)
+            time.sleep(0.02)
         return None
 
     def get_next_signal(self):

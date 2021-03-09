@@ -2,6 +2,7 @@ from FSMRule import FSMRule
 from inspect import isfunction
 from Keypad import Keypad
 from KPC import *
+import time
 
 states = [
     'S-Init',  # initial state. cump should be empty
@@ -62,13 +63,18 @@ class FSM:
         """
 
         while self.state != 'S-Exit':
+            print()
+            time.sleep(0.2)  # burde ikke trenge denne men klikker uten
+
+            print("Waiting for signal...")
             self.signal = self.get_next_signal()
-            # print(f"Received signal: {self.signal}")
+            print(f"Received signal: {self.signal}")
+
             ruleFired = False
             for rule in self.rules:
                 if self.state == rule.state1 and rule.match():
                     print(f"Rule to fire: {str(rule.state1)}")
-                    self.fire(rule)
+                    rule.fire()
                     ruleFired = True
                     break
 
