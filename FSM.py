@@ -19,6 +19,16 @@ def signal_is_digit(signal):
     return 48 <= ord(signal) <= 57
 
 
+def all_signals(signal):
+    """ Simple method to accept a signal """
+    return True
+
+
+def all_digits(signal):
+    """ Simple method to accept all digits """
+    return signal_is_digit(signal)
+
+
 class FSM:
     """  An FSM object should house a pointer back to the agent, since it will make many requests to the
     agent (KPC) object. """
@@ -54,40 +64,40 @@ class FSM:
         while self.state != 'S-Exit':
             self.signal = self.get_next_signal()
             # print(f"Received signal: {self.signal}")
+            ruleFired = False
             for rule in self.rules:
                 if self.state == rule.state1 and rule.match():
-                    print(f"Rule to fire: {rule}")
+                    print(f"Rule to fire: {str(rule.state1)}")
                     self.fire(rule)
+                    ruleFired = True
+                    break
 
                 else:
-                    print("No rules fired :(")
+                    print(
+                        f"Rule with start-state {str(rule.state1)} not fired")
 
-    def all_signals(self):
-        """ Simple method to accept a signal """
-        return True
-
-    def all_digits(self):
-        """ Simple method to accept all digits """
-        return signal_is_digit(self.signal)
+            if not ruleFired:
+                print("No rules fired")
+                break
 
     def add_rules(self):
         """ create and add the rules to be used """
         self.add_rule('S-Init', 'S-Read',
-                      self.all_signals, self.agent.reset_passcode_entry)
+                      all_signals, self.agent.reset_passcode_entry)
 
-        self.add_rule('S-Read', 'S-Read', self.all_digits,
+        self.add_rule('S-Read', 'S-Read', all_digits,
                       self.agent.append_next_password_digit)
 
         self.add_rule('S-Read', 'S-Verify', '*', self.agent.verify_login)
 
-        self.add_rule('S-Read', 'S-Init', self.all_signals,
+        self.add_rule('S-Read', 'S-Init', all_signals,
                       self.agent.exit_action)
 
         self.add_rule('S-Verify', 'S-Active', 'Y',
                       self.agent.fully_activate_agent)
 
         self.add_rule('S-Verify', 'S-Init',
-                      self.all_signals, self.agent.exit_action)
+                      all_signals, self.agent.exit_action)
 
         # look at page 9 in project description for more rules,
         # and take a look at drawing of FSM.
