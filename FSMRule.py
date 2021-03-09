@@ -1,5 +1,7 @@
 """ Module for FSM Rule class """
 
+from inspect import isfunction
+
 
 class FSMRule:
     """
@@ -32,9 +34,16 @@ class FSMRule:
         check whether the rule condition is fulfilled.
         :return: True if condition is fulfilled, False if not
         """
+
+        if isfunction(self.signal):
+            print("Signal is trigger, returning boolean")
+            return self.fsm.signal()
+
         if self.fsm.signal == self.signal:
+            print("Signal is not function, returning True")
             return True
         else:
+            print("Signal is not function, returning false")
             return False
 
     def fire(self, rule):

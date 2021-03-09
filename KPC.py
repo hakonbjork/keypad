@@ -88,4 +88,11 @@ class KPC:
 
     def exit_action(self):
         self.led_board.power_down_the_system()
-        self.__init__()
+        self.__init__(self.FSM)
+
+    def fully_activate_agent(self):
+        """ Vet ikke om man trenger noe her, etter denne er kjørt skal 
+        man være i stand til å gjøre ting i innlogget tilstand, men mulig
+        det fikses av FSM  """
+
+        pass

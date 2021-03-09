@@ -106,6 +106,8 @@ class LED_Board:
     def power_up_the_system(self):
         """ Lights up a pattern to signal that the system is booting up """
 
+        print("Powering up the system ...")
+
         self.turn_off_all_leds()
 
         for i in range(6):
@@ -131,6 +133,8 @@ class LED_Board:
 
     def power_down_the_system(self):
         """ Lights a pattern to signal system powering down """
+
+        print("Powering down the system...")
 
         self.turn_off_all_leds()
 

@@ -1,6 +1,7 @@
 from FSMRule import FSMRule
 from inspect import isfunction
 from Keypad import Keypad
+from KPC import *
 
 states = [
     'S-Init',  # initial state. cump should be empty
@@ -22,18 +23,18 @@ class FSM:
     """  An FSM object should house a pointer back to the agent, since it will make many requests to the
     agent (KPC) object. """
 
-    def __init__(self, agent):
+    def __init__(self):
         self.rules = []
         self.state = 'S-Init'
         self.signal = None
-        self.agent = agent
+        self.agent = KPC(self)
 
     def add_rule(self, s1, s2, signal, action):
         """
         add a new rule to the end of the FSM’s rule list.
         :return: None
         """
-        self.rules.append(FSMRule(s1, s2, signal, action))
+        self.rules.append(FSMRule(self, s1, s2, signal, action))
 
     def get_next_signal(self):
         """
@@ -41,7 +42,7 @@ class FSM:
         :return: None
         """
 
-        return agent.get_next_signal()
+        return self.agent.get_next_signal()
 
     def run(self):
         """
@@ -52,9 +53,14 @@ class FSM:
 
         while self.state != 'S-Exit':
             self.signal = self.get_next_signal()
+            # print(f"Received signal: {self.signal}")
             for rule in self.rules:
                 if self.state == rule.state1 and rule.match():
+                    print(f"Rule to fire: {rule}")
                     self.fire(rule)
+
+                else:
+                    print("No rules fired :(")
 
     def all_signals(self):
         """ Simple method to accept a signal """
@@ -66,17 +72,34 @@ class FSM:
 
     def add_rules(self):
         """ create and add the rules to be used """
-        rule_1 = FSMRule(self, 'S-Init', 'S-Read',
-                         self.all_signals, agent.reset_passcode_entry)
+        self.add_rule('S-Init', 'S-Read',
+                      self.all_signals, self.agent.reset_passcode_entry)
 
-        rule_2 = FSMRule(self, 'S-Read', 'S-Read', self.all_digits,
-                         agent.append_next_password_digit)
+        self.add_rule('S-Read', 'S-Read', self.all_digits,
+                      self.agent.append_next_password_digit)
 
-        rule_3 = FSMRule(self, 'S-Read', 'S-Verify', '*', agent.verify_login)
+        self.add_rule('S-Read', 'S-Verify', '*', self.agent.verify_login)
 
-        # look at page 11 in project description for more rules,
+        self.add_rule('S-Read', 'S-Init', self.all_signals,
+                      self.agent.exit_action)
+
+        self.add_rule('S-Verify', 'S-Active', 'Y',
+                      self.agent.fully_activate_agent)
+
+        self.add_rule('S-Verify', 'S-Init',
+                      self.all_signals, self.agent.exit_action)
+
+        # look at page 9 in project description for more rules,
         # and take a look at drawing of FSM.
         # Each arc/line there should correspond to a rule.
 
-    def main(self):
-        pass
+
+def main():
+    fsm = FSM()
+    fsm.add_rules()
+    print("Rules added succesfully")
+    fsm.run()
+
+
+if __name__ == "__main__":
+    main()
